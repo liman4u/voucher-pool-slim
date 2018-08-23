@@ -18,6 +18,7 @@ class RecipientController extends Controller
 
         return $response->withStatus(200)->withJson([
             'success' => true,
+            'count'    => count($recipients->toArray()),
             'data'     => $recipients->toArray()
         ]);
     }

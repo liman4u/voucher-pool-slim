@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Helpers\Validator;
 use App\Models\Offer;
-use League\Fractal\Resource\Collection;
 use Psr\Http\Message\{
     ServerRequestInterface as Request,
     ResponseInterface as Response
@@ -12,13 +11,19 @@ use Psr\Http\Message\{
 
 class OfferController extends Controller
 {
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return mixed
+     */
     public function index(Request $request, Response $response)
     {
         $offers = Offer::all();
 
         return $response->withStatus(200)->withJson([
             'success' => true,
-            'data'     => $offers->toArray()
+            'count'   => count($offers->toArray()),
+            'data'    => $offers->toArray()
         ]);
     }
 

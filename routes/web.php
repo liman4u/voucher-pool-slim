@@ -12,6 +12,6 @@ $app->post('/api/v1/recipients', RecipientController::class . ':store');
 
 $app->post('/api/v1/vouchers/generate', VoucherController::class . ':generateVouchers');
 $app->post('/api/v1/vouchers/validate', VoucherController::class . ':validateVoucher');
-$app->get('/api/v1/vouchers/recipients', VoucherController::class . ':getRecipientVouchers');
+$app->get('/api/v1/vouchers/recipient', VoucherController::class . ':getRecipientVouchers');
 
 

@@ -32,40 +32,60 @@ class VoucherController extends Controller
         if ($validator->isValid()) {
             $offer = Offer::find($request->getParam('offer_id'));
 
-            $recipients = Recipient::all();
+            if($offer){
 
-            foreach ($recipients as $recipient){
+                $recipients = Recipient::all();
 
-                $voucher_model = new Voucher();
+                foreach ($recipients as $recipient){
 
-                $input = array();
-                $input['recipient_id'] = $recipient->id;
-                $input['offer_id'] = $offer->id;
+                    $voucher_model = new Voucher();
 
-                $expiry = $request->getParam('expiry_date');
-                $input['expires_at'] = is_string($expiry) ? Carbon::parse($expiry) : $expiry;
+                    $input = array();
+                    $input['recipient_id'] = $recipient->id;
+                    $input['offer_id'] = $offer->id;
+
+                    $expiry = $request->getParam('expiry_date');
+                    $input['expires_at'] = is_string($expiry) ? Carbon::parse($expiry) : $expiry;
 
 
-                $voucher_model->create($input);
+                    $voucher_model->create($input);
 
+                }
+
+                $vouchers = Voucher::all();
+
+                return $response->withStatus(201)->withJson([
+                    'success' => true,
+                    'count'  => count($vouchers->toArray()),
+                    'data'     => $vouchers->toArray()
+                ]);
+
+
+            }else{
+
+                return $response->withStatus(400)->withJson([
+                    'success' => false,
+                    'message' => 'Invalid Offer'
+                ]);
             }
 
-            $vouchers = Voucher::all();
 
-            return $response->withStatus(201)->withJson([
-                'status' => true,
-                'data'     => $vouchers->toArray()
-            ]);
         } else {
             // return an error on failed validation, with a statusCode of 400
             return $response->withStatus(400)->withJson([
-                'status' => false,
+                'success' => false,
                 'message' => $validator->getErrors()
             ]);
         }
     }
 
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     */
     public function validateVoucher(Request $request, Response $response, $args)
     {
         $validator = $this->c->validator->validate($request, [
@@ -93,32 +113,38 @@ class VoucherController extends Controller
                     $activate_voucher   =   $voucher_model->activateVoucher($voucher, $recipient_details->id);
                     // return voucher details
                     return $response->withStatus(200)->withJson([
-                        'status'    => true,
+                        'success'    => true,
                         'data'      => $validate_voucher
                     ]);
                 } else {
                     // return failure message if voucher does not exist
                     return $response->withStatus(403)->withJson([
-                        'status' => false,
+                        'success' => false,
                         'message' => 'Voucher code is invalid'
                     ]);
                 }
             } else {
                 // return failure message if user does not exist
                 return $response->withStatus(400)->withJson([
-                    'status' => false,
+                    'success' => false,
                     'message' => 'Recipient does not exist'
                 ]);
             }
         } else {
             // return failure message if validation fails
             return $response->withStatus(400)->withJson([
-                'status' => false,
+                'success' => false,
                 'message' => $validator->getErrors()
             ]);
         }
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return mixed
+     */
     public function getRecipientVouchers(Request $request, Response $response, $args)
     {
         $validator = $this->c->validator->validate($request, [
@@ -142,7 +168,7 @@ class VoucherController extends Controller
 
                 //return voucher details
                 return $response->withStatus(200)->withJson([
-                    'status' => true,
+                    'success' => true,
                     'count'     => count($recipient_vouchers),
                     'data'     => $recipient_vouchers
                 ]);
@@ -150,13 +176,13 @@ class VoucherController extends Controller
             } else {
                 //return failure message if user does not exist
                 return $response->withStatus(400)->withJson([
-                    'status' => false,
+                    'success' => false,
                     'message' => 'User does not exist'
                 ]);
             }
         } else {
             return $response->withStatus(400)->withJson([
-                'status' => false,
+                'success' => false,
                 'message' => $validator->getErrors()
             ]);
         }
