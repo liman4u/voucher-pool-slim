@@ -21,8 +21,6 @@ class CreateVouchersTable extends AbstractMigration
             ->addColumn('created_at', 'datetime', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('updated_at', 'datetime', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('deleted_at', 'datetime', ['null' => true])
-            ->addForeignKey('recipient_id', 'recipients', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
-            ->addForeignKey('offer_id', 'offers', 'id', ['delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'])
             ->addIndex(['code'], ['unique' => true])
 
             ->save();
